@@ -249,14 +249,20 @@ class web_server(BaseHTTPRequestHandler):
         if(self.headers["Content-Length"] is None):
             self.send_web_response(webstatus.SERV_FAILURE, "Bad request.")
             return
+        
+        form = None
 
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST',
-                     'CONTENT_TYPE':self.headers['Content-Type']
-            }
-        )
+        try:
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST',
+                         'CONTENT_TYPE':self.headers['Content-Type']
+                }
+            )
+        except Exception:
+            self.send_web_response(webstatus.SERV_FAILURE, "Could not parse post data!")
+            return 
 
         post_data = {}
         for f_obj in form.list:
