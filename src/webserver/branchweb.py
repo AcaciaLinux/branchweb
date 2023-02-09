@@ -291,6 +291,16 @@ class web_server(BaseHTTPRequestHandler):
 
         return 
 
+    #
+    # Handle a OPTIONS request
+    #
+    def do_OPTIONS(self):
+        WEB_CONFIG["logger_function_info"]("Handling API-options request from {}..".format(self.client_address))
+
+        self.send_web_response(webstatus.SUCCESS, "OK")
+
+        return
+
 #
 # stub class of ThreadedHTTPServer
 #
