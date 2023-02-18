@@ -10,11 +10,19 @@ from socketserver import ThreadingMixIn
 from functools import wraps
 
 WEB_CONFIG = {
+    "key_timeout": 900,
     "web_debug": False,
     "logger_function_debug": print,
     "logger_function_info": print,
     "send_cors_headers": False
 }
+
+# easier access to functions in web_config
+def debug(msg):
+    WEB_CONFIG["logger_function_debug"](msg)
+
+def info(msg):
+    WEB_CONFIG["logger_function_info"](msg)
 
 #
 # endpoint class with path and corresponding handler function
@@ -58,7 +66,7 @@ class web_server(BaseHTTPRequestHandler):
     # Overwrite BaseHTTPRequestHandler to logger_function
     #
     def log_message(self, format, *args):
-        WEB_CONFIG["logger_function_info"]("[branchweb] {}".format(*args))
+        info("[branchweb] {}".format(*args))
 
     # List of currently active HTTPSessions
     active_sessions = [ ]
@@ -78,7 +86,7 @@ class web_server(BaseHTTPRequestHandler):
     @staticmethod
     def register_get_endpoints(get_dict):
         for path in get_dict:
-            WEB_CONFIG["logger_function_debug"]("Registered GET endpoint for path: {}".format(path))
+            info("Registered GET endpoint for path: {}".format(path))
             web_server.get_endpoints.append(endpoint(path, get_dict[path]))
     #
     # Registers a POST function to the webserver
@@ -88,7 +96,7 @@ class web_server(BaseHTTPRequestHandler):
     @staticmethod
     def register_post_endpoints(post_dict):
         for path in post_dict:
-            WEB_CONFIG["logger_function_debug"]("Registered POST endpoint for path: {}".format(path))
+            info("Registered POST endpoint for path: {}".format(path))
             web_server.post_endpoints.append(endpoint(path, post_dict[path]))
 
     #
@@ -142,8 +150,8 @@ class web_server(BaseHTTPRequestHandler):
     #
     def end_headers(self):
         if(WEB_CONFIG["send_cors_headers"]):
-            WEB_CONFIG["logger_function_info"]("Sending Wildcard CORS headers.")
-            WEB_CONFIG["logger_function_info"]("This should only be used for debugging purposes.")
+            info("Sending Wildcard CORS headers.")
+            info("This should only be used for debugging purposes.")
 
             self.send_header('Access-Control-Allow-Origin', "*")
             self.send_header('Access-Control-Allow-Methods', "*")
@@ -155,7 +163,7 @@ class web_server(BaseHTTPRequestHandler):
     # to the current HTTPHandler
     #
     def write_answer_encoded(self, message):
-        WEB_CONFIG["logger_function_debug"]("Sending message: {}".format(message))
+        debug("Sending message: {}".format(message))
         self.wfile.write(bytes(message, "utf-8"))
 
     #
@@ -204,7 +212,7 @@ class web_server(BaseHTTPRequestHandler):
     # handle the get request
     #
     def do_GET(self):
-        WEB_CONFIG["logger_function_info"]("Handling API-get request from {}..".format(self.client_address))
+        info("Handling API-get request from {}..".format(self.client_address))
 
         real_path, form_dict = self.fetch_real_path()
         if(real_path is None):
@@ -219,12 +227,12 @@ class web_server(BaseHTTPRequestHandler):
                     endpoint.handlerfunc(self, form_dict)
                     no_match = False
                 except Exception as ex:
-                    WEB_CONFIG["logger_function_info"]("Exception raised in endpoint function for {}: {}".format(real_path, ex))
-                    WEB_CONFIG["logger_function_info"]("Errors from the webserver are not fatal to the masterserver.")
-                    WEB_CONFIG["logger_function_info"]("Connection reset.")
+                    info("Exception raised in endpoint function for {}: {}".format(real_path, ex))
+                    info("Errors from the webserver are not fatal to the masterserver.")
+                    info("Connection reset.")
                     
                     if(WEB_CONFIG["webdebug"]):
-                        WEB_CONFIG["logger_function_debug"]("Stacktrace:")
+                        debug("Stacktrace:")
                         traceback.print_exc()
 
                     self.send_web_response(webstatus.SERV_FAILURE, "Internal server error.")
@@ -238,7 +246,7 @@ class web_server(BaseHTTPRequestHandler):
     # handle a post request
     #
     def do_POST(self):
-        WEB_CONFIG["logger_function_info"]("Handling API-post request from {}..".format(self.client_address))
+        info("Handling API-post request from {}..".format(self.client_address))
 
         real_path, form_dict = self.fetch_real_path()
         if(real_path is None):
@@ -276,12 +284,12 @@ class web_server(BaseHTTPRequestHandler):
                     endpoint.handlerfunc(self, form_dict, post_data)
                     no_match = False
                 except Exception as ex:
-                    WEB_CONFIG["logger_function_info"]("Exception raised in endpoint function for {}: {}".format(real_path, ex))
-                    WEB_CONFIG["logger_function_info"]("Errors from the webserver are not fatal to the masterserver.")
-                    WEB_CONFIG["logger_function_info"]("Connection reset.")
+                    info("Exception raised in endpoint function for {}: {}".format(real_path, ex))
+                    info("Errors from the webserver are not fatal to the masterserver.")
+                    info("Connection reset.")
                     
                     if(WEB_CONFIG["webdebug"]):
-                        WEB_CONFIG["logger_function_debug"]("Stacktrace:")
+                        debug("Stacktrace:")
                         traceback.print_exc()
 
                     self.send_web_response(webstatus.SERV_FAILURE, "Internal server error.")
@@ -295,10 +303,8 @@ class web_server(BaseHTTPRequestHandler):
     # Handle a OPTIONS request
     #
     def do_OPTIONS(self):
-        WEB_CONFIG["logger_function_info"]("Handling API-options request from {}..".format(self.client_address))
-
+        info("Handling API-options request from {}..".format(self.client_address))
         self.send_web_response(webstatus.SUCCESS, "OK")
-
         return
 
 #
@@ -317,6 +323,6 @@ def start_web_server(hostname, serverport):
         web_serv = ThreadedHTTPServer((hostname, serverport), web_server)
         web_serv.serve_forever()
     except Exception as ex:
-        WEB_CONFIG["logger_function_info"]("Webserver failed to initialize: {}".format(ex))
-        WEB_CONFIG["logger_function_info"]("Thread exiting.")
+        info("Webserver failed to initialize: {}".format(ex))
+        info("Thread exiting.")
         return
