@@ -231,11 +231,12 @@ class web_server(BaseHTTPRequestHandler):
                     info("Errors from the webserver are not fatal to the masterserver.")
                     info("Connection reset.")
                     
-                    if(WEB_CONFIG["webdebug"]):
+                    if(WEB_CONFIG["web_debug"]):
                         debug("Stacktrace:")
                         traceback.print_exc()
 
                     self.send_web_response(webstatus.SERV_FAILURE, "Internal server error.")
+                    return
 
         if(no_match):
             self.send_web_response(webstatus.SERV_FAILURE, "Bad request.")
@@ -288,11 +289,12 @@ class web_server(BaseHTTPRequestHandler):
                     info("Errors from the webserver are not fatal to the masterserver.")
                     info("Connection reset.")
                     
-                    if(WEB_CONFIG["webdebug"]):
+                    if(WEB_CONFIG["web_debug"]):
                         debug("Stacktrace:")
                         traceback.print_exc()
 
                     self.send_web_response(webstatus.SERV_FAILURE, "Internal server error.")
+                    return
 
         if(no_match):
             self.send_web_response(webstatus.SERV_FAILURE, "Bad request.")
