@@ -261,21 +261,31 @@ class web_server(BaseHTTPRequestHandler):
         
         form = None
 
+        post_data = {}
+
         try:
-            form = cgi.FieldStorage(
-                fp=self.rfile,
-                headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                         'CONTENT_TYPE':self.headers['Content-Type']
-                }
-            )
+
+            # If we received JSON data, handle it seperately
+            if(self.headers["Content-Type"] == "application/json"):
+                post_data = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+
+            # Else just parse the multipart data
+            else:
+                form = cgi.FieldStorage(
+                    fp=self.rfile,
+                    headers=self.headers,
+                    environ={'REQUEST_METHOD':'POST',
+                            'CONTENT_TYPE':self.headers['Content-Type']
+                    }
+                )
+
+                # And convert it to a dict
+                for f_obj in form.list:
+                    post_data[f_obj.name] = f_obj.value
+
         except Exception:
             self.send_web_response(webstatus.SERV_FAILURE, "Could not parse post data!")
             return 
-
-        post_data = {}
-        for f_obj in form.list:
-            post_data[f_obj.name] = f_obj.value
        
         no_match = True
         for endpoint in web_server.post_endpoints:
