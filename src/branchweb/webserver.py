@@ -170,10 +170,13 @@ class web_server(BaseHTTPRequestHandler):
     # send web response
     #
     def send_web_response(self, status, payload):
+        wr = webresponse(status, payload).json_str()
         self.send_response(200)
+
         self.send_header("Content-type", "application/json")
+        self.send_header("Content-Length", len(bytes(wr, "utf-8")))
         self.end_headers()
-        self.write_answer_encoded(webresponse(status, payload).json_str())
+        self.write_answer_encoded(wr)
 
     #
     # send a raw string response without wrapping it in a webresponse object 
