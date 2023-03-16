@@ -1,0 +1,16 @@
+
+import uuid
+import time
+
+class key():
+
+    key_id: str
+    timestamp: time
+
+    def __init__(self):
+        """
+        Creates a new key with a own UUID and timestamp
+        """
+
+        self.key_id = str(uuid.uuid4())
+        self.timestamp = time.time()
