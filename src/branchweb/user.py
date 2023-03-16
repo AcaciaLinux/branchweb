@@ -12,28 +12,57 @@ class user():
     phash: str = ""
     authkeys: dict[str, key] = { }
 
-    def __init__(self, name: str, phash :str):
+    def __init__(self, name: str, passwd :str):
         """
         Creates a new user
 
-        Args:
+        Args
+        ----
             name (str): The username for the user
-            phash (str): The password hash
+            passwd (str): The password in plaintext
         """
 
         self.name = name
-        self.phash = phash
 
-    def authenticate(self, chash: str) -> key:
+        byte_array = passwd.encode("utf-8")
+        salt = bcrypt.gensalt()
+        passwdhash = bcrypt.hashpw(byte_array, salt)
+
+        self.phash = passwdhash.decode("utf-8")
+
+    @staticmethod
+    def from_pw_hash(name: str, phash: str) -> super:
         """
-        Checks if the supplied hash is valid for the user
+        Constructs a new user with the supplied hash instead of the password
+
+        Args
+        ----
+            name (str): The username
+            phash (str): The password hash
+
+        Returns:
+        A user instance
+        """
+
+        u = user(name, "")
+        u.phash = phash
+
+        return u
+
+    def authenticate(self, passwd: str) -> key:
+        """
+        Checks if the supplied password is valid for the user and returns an authkey
+
+        Args
+        ----
+            passwd: (str): The password to validate
 
         Returns
         -------
         The new authkey or None on failure
         """
 
-        if (bcrypt.checkpw(chash.encode("utf-8"), self.phash.encode("utf-8"))):
+        if (bcrypt.checkpw(passwd.encode("utf-8"), self.phash.encode("utf-8"))):
             newkey = key()
             self.authkeys[newkey.key_id] = newkey
             return newkey
