@@ -142,6 +142,7 @@ class usermanager():
         ----
             user_file_path (str): The file to read or create
         """
+        self.users = []
 
         if(not os.path.exists(user_file_path)):
             self.create_userfile(user_file_path)
