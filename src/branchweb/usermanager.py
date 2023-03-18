@@ -49,9 +49,9 @@ class usermanager():
 
         return None
 
-    def get_key_user(self, key_id: str) -> user:
+    def get_key_owner(self, key_id: str) -> user:
         """
-        Returns the user that matches the supplied key_id
+        Returns the user that owns the supplied key id
 
         Args
         ----
