@@ -49,6 +49,21 @@ class user():
 
         return u
 
+    def set_password(self, passwd: str):
+        """
+        Sets a new password for this user
+
+        Args
+        ----
+            passwd (str): The new password to set
+        """
+
+        byte_array = passwd.encode("utf-8")
+        salt = bcrypt.gensalt()
+        passwdhash = bcrypt.hashpw(byte_array, salt)
+
+        self.phash = passwdhash.decode("utf-8")
+
     def authenticate(self, passwd: str) -> key:
         """
         Checks if the supplied password is valid for the user and returns an authkey
