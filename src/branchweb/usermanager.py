@@ -81,7 +81,7 @@ class usermanager():
         The user that owned the authkey, None if the key was never valid
         """
 
-        user = self.get_key_user(key_id)
+        user = self.get_key_owner(key_id)
 
         if (user is None):
             return None
@@ -165,7 +165,13 @@ class usermanager():
             usern = user_arr[0]
             phash = user_arr[1]
 
-            self.users.append(user.from_pw_hash(usern, phash))
+            found = False
+            for u in self.users:
+                if(u.name == usern):
+                    found = True
+
+            if (not found):
+                self.users.append(user.from_pw_hash(usern, phash))
 
     def create_userfile(self, user_file_path: str):
         """
