@@ -80,6 +80,7 @@ class user():
         if (bcrypt.checkpw(passwd.encode("utf-8"), self.phash.encode("utf-8"))):
             newkey = key()
             self.authkeys[newkey.key_id] = newkey
+            print("User {} authenticated for key {}".format(self.name, newkey.key_id))
             return newkey
         else:
             return None
@@ -97,7 +98,7 @@ class user():
         true or false
         """
 
-        return authkey in self.authkeys
+        return authkey in self.authkeys.keys()
 
     def revoke_authkey(self, authkey: str) -> bool:
         """
