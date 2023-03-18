@@ -1,5 +1,6 @@
 
 import bcrypt
+import time
 
 from .key import key
 
@@ -118,3 +119,26 @@ class user():
         del self.authkeys[authkey]
 
         return True
+
+    def clean_dangling_keys(self, cur_time: time, lifetime: int) -> int:
+        """
+        Checks for dangling keys in this user and revokes them
+
+        Args
+        ----
+            cur_time (time): The time to check against (the current time)
+            lifetime (int): The lifetime of keys in seconds
+
+        Returns
+        -------
+        The amount of keys revoked
+        """
+
+        revoked_keys = 0
+
+        for (hash, key) in self.authkeys:
+            if((cur_time - key.timestamp) > lifetime):
+                self.revoke_authkey(hash)
+                revoked_keys = revoked_keys + 1
+
+        return revoked_keys
