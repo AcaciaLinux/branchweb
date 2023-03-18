@@ -13,9 +13,6 @@ from . import webserver
 # 
 class usermanager():
 
-    users: list[user] = [ ]
-    userfile: str = ""
-
     def __init__(self, user_file: str = USER_FILE):
         """
         Creates a new usermanager and reads or creates the userfile
@@ -27,7 +24,8 @@ class usermanager():
 
         webserver.debug("Initializing new user manager with userfile at {}".format(user_file))
 
-        self.userfile = user_file
+        self.userfile: str = user_file
+        self.users: list[user] = []
         self.read_file(user_file)
 
     def get_user(self, name: str) -> user:
