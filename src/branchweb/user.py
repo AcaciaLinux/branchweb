@@ -9,10 +9,6 @@ from .key import key
 #
 class user():
 
-    name: str = ""
-    phash: str = ""
-    authkeys: dict[str, key] = { }
-
     def __init__(self, name: str, passwd :str = None):
         """
         Creates a new user
@@ -23,7 +19,9 @@ class user():
             passwd (str, optional): The password in plaintext
         """
 
-        self.name = name
+        self.name: str = name
+        self.phash: str = ""
+        self.authkeys: dict[str, key] = {}
 
         if (passwd is not None):
             byte_array = passwd.encode("utf-8")
