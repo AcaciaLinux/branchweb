@@ -13,23 +13,24 @@ class user():
     phash: str = ""
     authkeys: dict[str, key] = { }
 
-    def __init__(self, name: str, passwd :str):
+    def __init__(self, name: str, passwd :str = None):
         """
         Creates a new user
 
         Args
         ----
             name (str): The username for the user
-            passwd (str): The password in plaintext
+            passwd (str, optional): The password in plaintext
         """
 
         self.name = name
 
-        byte_array = passwd.encode("utf-8")
-        salt = bcrypt.gensalt()
-        passwdhash = bcrypt.hashpw(byte_array, salt)
+        if (passwd is not None):
+            byte_array = passwd.encode("utf-8")
+            salt = bcrypt.gensalt()
+            passwdhash = bcrypt.hashpw(byte_array, salt)
 
-        self.phash = passwdhash.decode("utf-8")
+            self.phash = passwdhash.decode("utf-8")
 
     @staticmethod
     def from_pw_hash(name: str, phash: str) -> super:
@@ -45,7 +46,7 @@ class user():
         A user instance
         """
 
-        u = user(name, "")
+        u = user(name)
         u.phash = phash
 
         return u
