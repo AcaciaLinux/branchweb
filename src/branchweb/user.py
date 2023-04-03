@@ -137,7 +137,7 @@ class user():
         revoked_keys = 0
 
         for (hash, key) in self.authkeys:
-            if((cur_time - key.timestamp) > lifetime):
+            if (key.has_expired(cur_time, lifetime)):
                 self.revoke_authkey(hash)
                 revoked_keys = revoked_keys + 1
 
