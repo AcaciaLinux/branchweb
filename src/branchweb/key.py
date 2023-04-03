@@ -14,3 +14,17 @@ class key():
 
         self.key_id = str(uuid.uuid4())
         self.timestamp = time.time()
+
+    def refresh(self):
+        """
+        Refreshes the timestamp of this key
+        """
+
+        self.timestamp = time.time()
+
+    def has_expired(self, cur_time: time, lifetime: int):
+        """
+        Checks if this key has expired
+        """
+
+        return (cur_time - self.timestamp) > lifetime
