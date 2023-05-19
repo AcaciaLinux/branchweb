@@ -164,7 +164,10 @@ class web_server(BaseHTTPRequestHandler):
     #
     def write_answer_encoded(self, message):
         debug("Sending message: {}".format(message))
-        self.wfile.write(bytes(message, "utf-8"))
+        try:
+            self.wfile.write(bytes(message, "utf-8"))
+        except BrokenPipeError:
+            debug("Client closed socket before request could be completed.")
 
     #
     # send web response
