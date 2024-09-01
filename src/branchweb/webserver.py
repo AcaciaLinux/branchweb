@@ -194,19 +194,24 @@ class web_server(BaseHTTPRequestHandler):
     # send a file response to the current http handler
     # 
     def send_file(self, file, file_len, file_name):
-        self.send_response(200)
-        self.send_header("Content-type", "application/octet-stream")
-        self.send_header("Content-Length", file_len)
-        self.send_header("Content-Disposition", "filename=\"" + file_name + "\"")
-        self.end_headers()
+        try:
+            self.send_response(200)
+            self.send_header("Content-type", "application/octet-stream")
+            self.send_header("Content-Length", file_len)
+            self.send_header("Content-Disposition", "filename=\"" + file_name + "\"")
+            self.end_headers()
 
-        while True:
-            bytes_read = file.read(4096)
+            while True:
+                bytes_read = file.read(4096)
 
-            if(not bytes_read):
-                break
+                if(not bytes_read):
+                    break
 
-            self.wfile.write(bytes_read)
+                self.wfile.write(bytes_read)
+ 
+        except ConnectionResetError:
+            info("Client disconnected before file download completed.")
+
 
     #
     # send generic malformed request response
